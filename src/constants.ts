@@ -1,1 +1,1 @@
-export const serverUrl = 'http://localhost:3000';
+export const serverUrl = 'https://stormy-fjord-00115.herokuapp.com';

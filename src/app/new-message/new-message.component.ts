@@ -10,7 +10,7 @@ import { SocketService } from '../socket.service';
 export class NewMessageComponent implements OnChanges {
   @Input() roomName: string;
   @Input() username: string;
-  private message: string;
+  message: string;
 
   constructor(private socketService: SocketService) { }
 

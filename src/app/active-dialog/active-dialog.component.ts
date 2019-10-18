@@ -111,7 +111,7 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
     if (this.skipAmount === 0) {
       setTimeout(() => {
         this.scrollbottom();
-      }, 500);
+      }, 1000);
     }
 
     if (this.lastMessagesLength < this.messages.length) {
