@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { SocketService } from '../../services/socket.service';
 import { first } from 'rxjs/operators';
-import { serverUrl } from '../../constants';
+import { serverUrl } from '../../constants/serverURL';
 import { User } from '../../interfaces/user';
 
 @Component({
@@ -25,9 +25,6 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.chatService.getUsers()
-      .pipe(
-        first()
-      )
       .subscribe((data: any) => {
         this.users = data.users.filter(user => user.name !== this.username);
         this.setActiveRoom(this.users.find(user => user.name === 'General room'));

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { first, tap } from 'rxjs/operators';
-import { serverUrl } from '../constants';
+import { serverUrl } from '../constants/serverURL';
 
 @Injectable({
   providedIn: 'root'

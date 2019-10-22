@@ -2,11 +2,11 @@
   <input
     type="text"
     class="new-message__input"
-    (keyup.enter)="sendMessage(); message = ''"
+    (keyup.enter)="sendMessage()"
     [(ngModel)]="message"
     (keydown)="typing()"
   >
-  <button id="send" (click)="sendMessage(); message = ''" class="new-message__send-btn">
+  <button id="send" (click)="sendMessage()" class="new-message__send-btn">
     Send message
   </button>
 </div>

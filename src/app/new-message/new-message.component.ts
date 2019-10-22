@@ -12,16 +12,19 @@ export class NewMessageComponent implements OnChanges {
   @Input() username: string;
   message: string;
 
-  constructor(private socketService: SocketService) { }
+  constructor(private socketService: SocketService) {
+  }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.message = '';
   }
 
-  sendMessage() {
+  sendMessage(): void {
     if (!this.message.replace(/\s+/, '')) {
+      this.message = '';
       return;
     }
+
     this.socketService.sendMessage({
       room: this.roomName,
       message: {
@@ -30,10 +33,11 @@ export class NewMessageComponent implements OnChanges {
         sendAt: moment().format('h:mm A'),
       },
     });
+
     this.message = '';
   }
 
-  typing() {
+  typing(): void {
     this.socketService.typing({
       roomName: this.roomName,
       user: this.username,

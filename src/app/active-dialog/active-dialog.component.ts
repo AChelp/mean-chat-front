@@ -9,12 +9,11 @@ import {
 } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { SocketService } from '../../services/socket.service';
-import { serverUrl } from '../../constants';
+import { serverUrl } from '../../constants/serverURL';
 import * as moment from 'moment';
 import { Message } from '../../interfaces/message';
 import { User } from '../../interfaces/user';
 
-// @ts-ignore
 @Component({
   selector: 'app-active-dialog',
   templateUrl: './active-dialog.component.html',
@@ -130,7 +129,7 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
     }
   }
 
-  scrollbottom() {
+  scrollbottom(): void {
     this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
   }
 }
