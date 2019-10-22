@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { serverUrl } from '../constants';
+import { serverUrl } from '../constants/serverURL';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class ChatService {
     return this.http.get(`${serverUrl}/users`);
   }
 
-  public getRoomHistory(room, skipAmount) {
+  public getRoomHistory(room: string, skipAmount: number) {
     return this.http.get(`${serverUrl}/chatroom/${room}/${skipAmount}`);
   }
 }

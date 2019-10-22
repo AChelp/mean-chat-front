@@ -31,17 +31,11 @@
     </div>
   </div>
 
-<!--  infiniteScroll-->
-<!--  [infiniteScrollUpDistance]="0"-->
-<!--  [infiniteScrollThrottle]="500"-->
-<!--  [scrollWindow]="false"-->
-<!--  -->
-<!--  (scrolledUp)="loadMoreTen()"-->
-
   <div
     id="chat-window"
     class="messages"
     #messagesContainer
+    (scroll)="onScroll($event)"
   >
     <div
       [ngClass]="{

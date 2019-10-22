@@ -1,5 +1,5 @@
 import {
-  AfterViewChecked, AfterViewInit,
+  AfterViewChecked,
   Component,
   ElementRef,
   Input,
@@ -7,21 +7,22 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import { ChatService } from '../chat.service';
-import { SocketService } from '../socket.service';
-import { serverUrl } from '../../constants';
+import { ChatService } from '../../services/chat.service';
+import { SocketService } from '../../services/socket.service';
+import { serverUrl } from '../../constants/serverURL';
 import * as moment from 'moment';
+import { Message } from '../../interfaces/message';
+import { User } from '../../interfaces/user';
 
-// @ts-ignore
 @Component({
   selector: 'app-active-dialog',
   templateUrl: './active-dialog.component.html',
   styleUrls: ['./active-dialog.component.scss'],
 })
-export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecked, AfterViewInit {
+export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecked {
 
   @ViewChild('messagesContainer', { static: false }) private messagesContainer: ElementRef;
-  @Input() userToChat: { name: string, email: string, password: string, avatar: string, description?: string };
+  @Input() userToChat: User;
   @Input() username: string;
   @Input() roomName: string;
   serverUrl = serverUrl;
@@ -29,7 +30,7 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
   lastMessagesLength = 0;
   lastReceivedMessage: string;
   prevRoom: string;
-  messages: { user: string, message: string, sendAt: string }[] = [];
+  messages: Message[] = [];
   seen = { message: '', time: '' };
   skipAmount = 0;
 
@@ -39,29 +40,31 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
   ) {
     this.socketService.connect();
 
-    this.socketService.recieveNewMessages().subscribe(data => {
+    this.socketService.receiveNewMessages().subscribe((data: Message) => {
       this.messages.push(data);
       this.userIsTyping = '';
       this.lastReceivedMessage = data.message;
     });
 
-    this.socketService.receivedTyping().subscribe(data => {
-      this.userIsTyping = data.user;
+    this.socketService.receivedTyping().subscribe(({ user }): void => {
+      this.userIsTyping = user;
       setTimeout(() => {
         this.userIsTyping = '';
       }, 3000);
     });
 
-    this.socketService.receivedReadNotification().subscribe(data => {
-      this.seen = data;
-    });
+    this.socketService
+      .receivedReadNotification()
+      .subscribe((data: { message: '', time: '' }): void => {
+        this.seen = data;
+      });
   }
 
   ngOnInit(): void {
     this.socketService.showUserOnline(this.username);
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.messages = [];
     this.lastMessagesLength = 0;
     this.skipAmount = 0;
@@ -82,12 +85,11 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
       });
   }
 
-  loadMoreTen() {
+  loadMoreTen(): void {
     this.chatService.getRoomHistory(this.roomName, this.skipAmount)
-      .subscribe((messages: { user: string, message: string, sendAt: string }[]) => {
+      .subscribe((messages: Message[]) => {
 
         if (this.skipAmount === 0) {
-          console.log('scrolling down');
           this.scrollbottom();
         }
 
@@ -98,13 +100,10 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
     this.skipAmount += 10;
   }
 
-  ngAfterViewInit() {
-    console.log('handling scroll');
-    this.messagesContainer.nativeElement.addEventListener('scroll', () => {
-      if (this.messagesContainer.nativeElement.scrollTop === 0) {
-        this.loadMoreTen();
-      }
-    });
+  onScroll(event): void {
+    if (event.target.scrollTop === 0) {
+      this.loadMoreTen();
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -126,12 +125,11 @@ export class ActiveDialogComponent implements OnInit, OnChanges, AfterViewChecke
     }
 
     if (this.skipAmount === 0 && this.messagesContainer) {
-      console.log('view checked');
       this.scrollbottom();
     }
   }
 
-  scrollbottom() {
+  scrollbottom(): void {
     this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
   }
 }

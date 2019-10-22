@@ -2,8 +2,20 @@ import { Injectable } from '@angular/core';
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { serverUrl } from '../constants';
-import { HttpClient } from '@angular/common/http';
+import { serverUrl } from '../constants/serverURL';
+import { Message } from '../interfaces/message';
+
+interface JoinRoomInterface {
+  user: string;
+  room: string;
+  prevRoom: string;
+}
+
+interface ReadNotificationInterface {
+  roomName: string;
+  message: string;
+  time: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +23,10 @@ import { HttpClient } from '@angular/common/http';
 export class SocketService {
   private socket;
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router) {
   }
 
-  joinRoom(data) {
+  joinRoom(data: JoinRoomInterface) {
     this.socket.emit('join', data);
 
     return new Observable<{ isReady: boolean }>(observer => {
@@ -27,7 +39,7 @@ export class SocketService {
     });
   }
 
-  connect() {
+  connect(): void {
     const token = sessionStorage.getItem('token');
     this.socket = io(serverUrl);
     this.socket.on('connect', () => {
@@ -40,16 +52,16 @@ export class SocketService {
     });
   }
 
-  sendMessage(data) {
+  sendMessage(data: { room: string, message: Message }): void {
     this.socket.emit('message', data);
   }
 
-  showUserOnline(username) {
+  showUserOnline(username: string): void {
     this.socket.emit('say hello', username);
   }
 
-  recieveNewMessages() {
-    return new Observable<any>(observer => {
+  receiveNewMessages() {
+    return new Observable<Message>(observer => {
       this.socket.on('new message', data => {
         observer.next(data);
       });
@@ -60,7 +72,7 @@ export class SocketService {
   }
 
   updateOnlineUsers() {
-    return new Observable<any>(observer => {
+    return new Observable<string[]>(observer => {
       this.socket.on('online users updated', users => {
         observer.next(users);
       });
@@ -70,7 +82,7 @@ export class SocketService {
     });
   }
 
-  typing(data) {
+  typing(data: { roomName: string, user: string }) {
     this.socket.emit('typing', data);
   }
 
@@ -85,14 +97,13 @@ export class SocketService {
     });
   }
 
-  sendReadNotification(data) {
+  sendReadNotification(data: ReadNotificationInterface) {
     this.socket.emit('seen', data);
   }
 
   receivedReadNotification() {
     return new Observable<any>(observer => {
       this.socket.on('seen', (data) => {
-        console.log('seen emited')
         observer.next(data);
       });
       return () => {

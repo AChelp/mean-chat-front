@@ -11,7 +11,7 @@ import { ChatComponent } from './chat/chat.component';
 import { ActiveDialogComponent } from './active-dialog/active-dialog.component';
 import { UsersComponent } from './users/users.component';
 import { NewMessageComponent } from './new-message/new-message.component';
-import { FilterUsersPipe } from './filter-users.pipe';
+import { FilterUsersPipe } from '../pipes/filter-users.pipe';
 
 @NgModule({
   declarations: [

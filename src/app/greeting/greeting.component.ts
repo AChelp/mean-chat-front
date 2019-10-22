@@ -4,11 +4,14 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { AuthenticationService } from '../authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
-
-const URL = 'locallhost:3000/signup';
+import {
+  emailPattern,
+  namePattern,
+  passwordPattern
+} from '../../constants/validationPatterns';
 
 @Component({
   selector: 'app-greeting',
@@ -17,10 +20,6 @@ const URL = 'locallhost:3000/signup';
 })
 export class GreetingComponent implements OnInit {
   userDataForm: FormGroup;
-  namePattern = /^([^-\s][a-zA-Zа-яёА-ЯЁ ]{2,15})$/;
-  passwordPattern = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]{8,})$/;
-  // tslint:disable-next-line:max-line-length
-  emailPattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   isFileChoosen = false;
   isLogin = true;
 
@@ -34,7 +33,6 @@ export class GreetingComponent implements OnInit {
   ngOnInit() {
     if (sessionStorage.getItem('token')) {
       this.router.navigate(['/chat']);
-      console.log('redirecting to chat');
     }
     this.initForm();
   }
@@ -43,15 +41,15 @@ export class GreetingComponent implements OnInit {
     this.userDataForm = this.fb.group({
       name: [null, [
         Validators.required,
-        Validators.pattern(this.namePattern)
+        Validators.pattern(namePattern)
       ]],
       email: [null, [
         Validators.required,
-        Validators.pattern(this.emailPattern),
+        Validators.pattern(emailPattern),
       ]],
       password: [null, [
         Validators.required,
-        Validators.pattern(this.passwordPattern),
+        Validators.pattern(passwordPattern),
       ]],
       image: [null]
     });
@@ -66,7 +64,6 @@ export class GreetingComponent implements OnInit {
     const { controls, value } = this.userDataForm;
 
     if (!this.isLogin && this.userDataForm.invalid) {
-      console.log('error!')
       Object.keys(controls)
         .forEach(controlName => controls[controlName].markAsTouched());
       return;
@@ -75,13 +72,17 @@ export class GreetingComponent implements OnInit {
 
     if (this.isLogin) {
       this.authentication.loginUser(value)
-        .pipe(first())
+        .pipe(
+          first()
+        )
         .subscribe(data => {
           this.router.navigate(['/chat']);
         });
     } else {
       this.authentication.signUpUser(value)
-        .pipe(first())
+        .pipe(
+          first()
+        )
         .subscribe(data => {
           if (data.success) {
             this.isLogin = true;
