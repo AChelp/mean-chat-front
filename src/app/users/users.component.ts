@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ChatService } from '../chat.service';
-import { SocketService } from '../socket.service';
+import { ChatService } from '../../services/chat.service';
+import { SocketService } from '../../services/socket.service';
 import { first } from 'rxjs/operators';
 import { serverUrl } from '../../constants';
+import { User } from '../../interfaces/user';
 
 @Component({
   selector: 'app-users',
@@ -10,11 +11,11 @@ import { serverUrl } from '../../constants';
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
-  @Input() username;
-  @Input() setActiveRoom;
-  usersToShow;
-  users;
-  onlineUsers;
+  @Input() username: string;
+  @Input() setActiveRoom: (user: User) => void;
+  usersToShow: User[];
+  users: User[];
+  onlineUsers: string[];
   userSearchQuery = '';
   isShowOnline = false;
   serverUrl = serverUrl;
@@ -22,9 +23,11 @@ export class UsersComponent implements OnInit {
   constructor(private chatService: ChatService, private socketService: SocketService) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.chatService.getUsers()
-      .pipe(first())
+      .pipe(
+        first()
+      )
       .subscribe((data: any) => {
         this.users = data.users.filter(user => user.name !== this.username);
         this.setActiveRoom(this.users.find(user => user.name === 'General room'));
@@ -37,12 +40,12 @@ export class UsersComponent implements OnInit {
       });
   }
 
-  showAll() {
+  showAll(): void {
     this.isShowOnline = false;
     this.usersToShow = this.users;
   }
 
-  showOnline() {
+  showOnline(): void {
     this.isShowOnline = true;
     this.usersToShow = this.users.filter(user => this.onlineUsers.includes(user.name));
   }

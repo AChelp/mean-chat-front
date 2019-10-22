@@ -4,7 +4,7 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
-import { AuthenticationService } from '../authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
@@ -75,13 +75,17 @@ export class GreetingComponent implements OnInit {
 
     if (this.isLogin) {
       this.authentication.loginUser(value)
-        .pipe(first())
+        .pipe(
+          first()
+        )
         .subscribe(data => {
           this.router.navigate(['/chat']);
         });
     } else {
       this.authentication.signUpUser(value)
-        .pipe(first())
+        .pipe(
+          first()
+        )
         .subscribe(data => {
           if (data.success) {
             this.isLogin = true;

@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import * as moment from 'moment';
-import { SocketService } from '../socket.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-new-message',
@@ -24,9 +24,11 @@ export class NewMessageComponent implements OnChanges {
     }
     this.socketService.sendMessage({
       room: this.roomName,
-      user: this.username,
-      message: this.message,
-      sendAt: moment().format('h:mm A'),
+      message: {
+        user: this.username,
+        message: this.message,
+        sendAt: moment().format('h:mm A'),
+      },
     });
     this.message = '';
   }

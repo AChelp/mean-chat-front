@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { serverUrl } from '../constants';
 import { HttpClient } from '@angular/common/http';
+import * as moment from 'moment';
+import { Message } from '../interfaces/message';
 
 @Injectable({
   providedIn: 'root'
@@ -40,15 +42,15 @@ export class SocketService {
     });
   }
 
-  sendMessage(data) {
+  sendMessage(data: {room: string, message: Message}): void {
     this.socket.emit('message', data);
   }
 
-  showUserOnline(username) {
+  showUserOnline(username: string): void {
     this.socket.emit('say hello', username);
   }
 
-  recieveNewMessages() {
+  receiveNewMessages() {
     return new Observable<any>(observer => {
       this.socket.on('new message', data => {
         observer.next(data);
@@ -92,7 +94,6 @@ export class SocketService {
   receivedReadNotification() {
     return new Observable<any>(observer => {
       this.socket.on('seen', (data) => {
-        console.log('seen emited')
         observer.next(data);
       });
       return () => {
